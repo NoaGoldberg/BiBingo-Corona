@@ -2,7 +2,7 @@ CORONA BINGO (BIBI STATMENTS EDITION)!
 --------------------------------------
 
 Add/change phrases by editing words.txt file. Make sure not to have empty lines 
-(encluding at the end of the file)
+(including at the end of the file)
 
 **
 
@@ -16,6 +16,10 @@ URL:
 **
 
 Make sure no Hebrew in the path.
+
+**
+
+Note that the date is always the current date.
 
 **
 
