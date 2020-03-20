@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Corona BINGO!</title>
+	<meta charset="UTF-8">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+	<script src="html2canvas.js"></script>
+	<script src="FileSaver.js"></script>
+
+	<style type="text/css">
+		img {
+			object-fit: cover;
+			width: 150px;
+			height: 150px;
+			margin-left: 3.3333333333px;
+		}
+		th, tr, td {
+			border: 0;
+			background: white;
+		}
+
+		td {
+			width: 120px;
+			height: 120px;
+			border: 2px solid gray;
+			text-align: center;
+			color: white;
+			font-family: Calibri;
+			font-size: 20px;
+			direction: rtl;
+
+		}
+
+		table {
+			border: 2px solid gray;
+			background: #222222;
+			border-color: gray;
+		}
+
+		h1 {
+			text-align: center;
+			font-family: "Bookman Old Style";
+			font-size: 28px;
+
+		}
+
+		form {
+			margin-bottom: 6px;
+		}
+
+		#widget {
+			margin: 0px;
+			width: 500px;
+			padding: 20px;
+			color: #444444;
+		}
+
+		#copy {
+			margin-top: 10px;
+		}
+
+	</style>
+</head>
+<body onload="script()">
+	<div ng-app="myApp" ng-controller="myCtrl">
+		<!-- <h1>Game of Thrones BINGO!</h1> -->
+		<form>
+			Name: <input type="text" ng-model="name" id="name" ng-change="headerChange()">
+			<button ng-click="saveTable()">save</button>
+			<button ng-click="reload()">reload</button>
+
+		</form>
+		<div id="widget">
+			<h1 id="header">{{header_content}}<mark>{{board_id}}</mark></h1>
+			<table>
+				<tr ng-repeat="x in range(0,rows*rows-1,rows)">
+					<td ng-repeat="i in range(x,x+rows-1)">
+						{{phrases[i]}}
+					</td>
+				</tr>
+			</table>
+			<div id="copy">
+				<i>&copy; Noa Goldberg</i>
+			</div>
+		</div>
+	</div>
+
+	<br>
+
+	<script>
+		var global_var = ["error!"];
+		jQuery.get('words.txt', function(data){
+			global_var = data.split("\n").filter(function(e) {return e != ""});
+			console.log(global_var);
+
+		});
+
+
+		var app = angular.module('myApp', []);
+		app.controller('myCtrl', function($scope) {
+			$scope.range = function(min, max, step) {
+			    step = step || 1;
+			    var input = [];
+			    for (var i = min; i <= max; i += step) {
+			        input.push(i);
+			    }
+			    return input;
+			};
+			$scope.shuffle = function(array) {
+			  var currentIndex = array.length, temporaryValue, randomIndex;
+
+			  // While there remain elements to shuffle...
+			  while (0 !== currentIndex) {
+
+			    // Pick a remaining element...
+			    randomIndex = Math.floor(Math.random() * currentIndex);
+			    currentIndex -= 1;
+
+			    // And swap it with the current element.
+			    temporaryValue = array[currentIndex];
+			    array[currentIndex] = array[randomIndex];
+			    array[randomIndex] = temporaryValue;
+			  }
+
+			  return array;
+			}
+		    $scope.rows = 4;
+
+			$scope.words = global_var;
+		    $scope.phrases = $scope.shuffle($scope.words);
+
+			$scope.reload = function() {
+				location.reload()
+			};
+
+			$scope.saveTable = function() { 
+		        html2canvas($("#widget"), {
+					onrendered: function(canvas) {
+					    // document.body.appendChild(canvas);
+						canvas.toBlob(function(blob) {
+							saveAs(blob, $scope.name+".jpg"); 
+						});
+
+						setTimeout(function(){
+							location.reload();
+						}, 200);
+					}
+				});
+			};
+
+			var default_header = "BiBingo Corona " + get_date() + " ";
+			$scope.header_content = default_header;
+			$scope.headerChange = function() {
+				if (!isNaN($scope.name) && $scope.name != "") {
+					$scope.board_id = "#" + $scope.name;
+				} else {
+					$scope.board_id = "";
+				}
+			};
+
+
+
+		});
+
+		$("input").focus();
+	</script>
+</body>
+</html>
+
+<script type="text/javascript">
+		function get_random_light_color() {
+			return ("#" + (Math.floor(Math.random()*16777215) | 0x808080).toString(16)).padEnd(7, 0);
+		}
+
+		function get_random_dark_color() {
+			var rand = 0;
+			while (rand <= 0xfffff || rand > 0xffffff) {
+				rand = Math.floor(Math.random()*0xffffff);
+
+			}
+
+			var col = "#" + (rand & 0x7F7F7F).toString(16).padStart(6,0);
+			return col;
+		}
+
+		function get_random_color() {
+			return "#" + (Math.floor(Math.random()*16777215)).toString(16);
+		}
+
+		function get_date() {
+			var d = new Date();
+			return d.toLocaleDateString('en-GB');
+		}
+
+		var cells = document.getElementsByTagName('td');
+		function script() {
+			// body...
+			var widg = document.getElementById("widget");
+			
+
+			widg.style.backgroundColor = get_random_light_color();
+
+
+			for (var i=0, len=cells.length; i<len; i++){
+			    cells[i].style.backgroundColor = get_random_dark_color();
+			    // cells[i].textContent = "hello";
+			}
+
+		}
+		
+</script>
